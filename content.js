@@ -22,10 +22,10 @@ if (table) {
  * Fetches the status from chrome storage and updates the UI accordingly.
  * @param {NodeListOf<Element>} rows Table rows
  */
-async function fetchAndUpdate(rows) {
+async function fetchAndUpdate() {
   const pid = getPaperCollectionId();
   const items = await chrome.storage.local.get(pid)
-  const obj = items[pid];
+  const obj = items?.[pid]?.papers;
   if (obj) {
     //this paper id exists
     for (const id in obj) {
@@ -38,6 +38,22 @@ async function fetchAndUpdate(rows) {
     }
   }
 }
+/**
+ * The structure of the chrome storage is: 
+ * {
+ *   "paperCollectionId": {
+ *      "name": paperName,
+ *      "papers": {
+ *        "paperId": {
+ *             "status": "status",
+ *             "lastUpdated": "date",
+ *             "title": "string",
+ *         }
+ *      }
+ *    }
+ * }
+ * @param {Element} target 
+ */
 async function updateStatus(target) {
   //get the new status label
   const label = target.innerText;
@@ -45,25 +61,53 @@ async function updateStatus(target) {
   const paperCollectionId = getPaperCollectionId();
   //set the status in chrome storage
   let existingObj = await chrome.storage.local.get(paperCollectionId);
-  existingObj = existingObj[paperCollectionId];
+  const existingPapers = existingObj[paperCollectionId]?.papers ?? {};
   if (label == "Clear") {
     //delete the label key
-    delete existingObj[id];
-    await chrome.storage.local.set({ [paperCollectionId]: existingObj });
-
+    delete existingPapers[id];
+    await chrome.storage.local.set({
+      [paperCollectionId]: {
+        name: existingObj.name,
+        papers: existingPapers
+      }
+    });
   } else {
     chrome.storage.local.set({
       [paperCollectionId]: {
-        ...existingObj,
-        [id]: {
-          status: label,
-          lastUpdated: Date.now(),
+        name: getCollectionName(),
+        papers: {
+          ...existingPapers,
+          [id]: {
+            status: label,
+            lastUpdated: Date.now(),
+            title: getPaperName(id),
+          }
         }
       }
     }, () => {
-      console.log("Status updated");
+      console.log("Status updated!");
     });
   }
+}
+/**
+ * Get the paper (PDF) title name from corresponding row.
+ * @param {number} id Dropdown id
+ */
+function getPaperName(id) {
+  const button = document.getElementById(`dropdownMenu${id}`);
+  //get parent row (tr) from button
+  const row = button.parentElement.parentElement.parentElement;
+  //the title is in the first child of this row
+  const title = row.children[0].innerText;
+  return title;
+}
+/**
+ * Get the collection name from the page header info.
+ * @returns {string}
+ */
+function getCollectionName() {
+  const table = document.querySelector("table.itemDisplayTable");
+  return table.querySelector("tbody tr:first-child td:last-child").innerText;
 }
 function updateUI(target) {
   //set the corresponding dropdown innerText to the text of the clicked item.
