@@ -1,0 +1,7 @@
+html {
+  min-height: 5em;
+  min-width: 40em;
+}
+span img {
+  max-height: 100%;
+}
