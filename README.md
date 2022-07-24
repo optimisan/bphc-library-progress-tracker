@@ -13,5 +13,9 @@ Installing the extension:
 Usage:
 
 - Click on the dropdown next to each paper.
-- You can set the status of the paper to: - Done - To solve - Solving - Or clear the status.
-  To view all your papers at once, click on the extension icon in the chrome extension toolbar (or puzzle icon).
+- You can set the status of the paper to:
+  - Done
+  - To solve
+  - Solving
+  - Or clear the status.
+    To view all your papers at once, click on the extension icon in the chrome extension toolbar (or puzzle icon).
