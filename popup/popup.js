@@ -14,7 +14,7 @@ function getClassFromStatus(status) {
   }
 }
 
-const BASE_URL = `http://125.22.54.221:8080/jspui/handle/123456789/`;
+const BASE_URL = `http://125.22.54.221:8080/jspui`;
 
 const STATUS = {
   TO_SOLVE: "To solve",
